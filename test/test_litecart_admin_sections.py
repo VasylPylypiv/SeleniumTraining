@@ -11,7 +11,6 @@ def test_litecart_admin_login():
     driver.implicitly_wait(5)
     links = driver.find_elements_by_css_selector("li[id='app-']")
     for i in range(len(links)):
-        links = driver.find_elements_by_css_selector("li[id='app-']")
         links[i].click()
         sublinks = driver.find_elements_by_css_selector(".docs li")
         if len(sublinks) != []:
