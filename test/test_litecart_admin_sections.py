@@ -1,4 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
 
 
 def test_litecart_admin_login():
@@ -6,20 +9,22 @@ def test_litecart_admin_login():
     driver.get("http://localhost/litecart/admin/")
     driver.find_element_by_name('username').send_keys('admin')
     driver.find_element_by_name('password').send_keys('admin')
-    driver.find_element_by_class_name('btn.btn-default').click()
+    driver.find_element_by_css_selector('button.btn.btn-default').click()
 
-    driver.implicitly_wait(5)
-    links = driver.find_elements_by_css_selector("li[id='app-']")
-    for i in range(len(links)):
-        links[i].click()
-        sublinks = driver.find_elements_by_css_selector(".docs li")
-        if len(sublinks) != []:
-            for s in range(len(sublinks)):
-                sublinks = driver.find_elements_by_css_selector(".docs li")
-                sublinks[s].click()
-                assert len(driver.find_elements_by_tag_name('h1')) == 1
-        else:
-            assert len(
-                driver.find_elements_by_tag_name('h1')) == 1
+    driver.implicitly_wait(3)
 
-    driver.quit()
+    links = len(driver.find_elements_by_css_selector("ul#box-apps-menu li#app-"))
+
+    for l in range(links):
+        driver.find_elements_by_css_selector("ul#box-apps-menu li#app-")[l].click()
+        WebDriverWait(driver, 1).until(
+            EC.presence_of_element_located((By.TAG_NAME, "h1")))
+        if len(driver.find_elements_by_css_selector("ul#box-apps-menu li.selected ul li")) != 0:
+            sublinks = len(driver.find_elements_by_css_selector("ul#box-apps-menu "
+                                                                "li.selected ul li"))
+            for s in range(sublinks):
+                driver.find_elements_by_css_selector("ul#box-apps-menu "
+                                                     "li.selected ul li")[s].click()
+                WebDriverWait(driver, 1).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "h1")))
+    driver.close()
